@@ -4,12 +4,17 @@ import SearchBar from "./components/SearchBar";
 import "./App.css";
 import Youtube from "./apis/youtube";
 import VideoList from "./components/VideoList";
+import VideoDetails from "./components/VideoDetails";
 
 class App extends Component {
   state = {
     videos: [],
     selectedVideo: null
   };
+
+  componentDidMount() {
+    this.onTermSubmit("ReactJs");
+  }
 
   onTermSubmit = async term => {
     //assyncronous API request
@@ -19,21 +24,35 @@ class App extends Component {
         q: term
       }
     });
-    this.setState({ videos: response.data.items });
+    this.setState({
+      videos: response.data.items,
+      selectedVideo: response.data.items[0]
+      //this is going to show the first video on the list
+      //in the beggining
+    });
   };
 
   onVideoSelect = video => {
-    console.log("from app.js", video);
+    this.setState({ selectedVideo: video });
   };
 
   render() {
     return (
       <div className="ui container">
         <SearchBar onFormSubmit={this.onTermSubmit} />
-        <VideoList
-          onVideoSelect={this.onVideoSelect}
-          videos={this.state.videos}
-        />
+        <div className="ui grid">
+          <div className="ui row">
+            <div className="eleven wide column">
+              <VideoDetails video={this.state.selectedVideo} />
+            </div>
+            <div className="five wide column">
+              <VideoList
+                onVideoSelect={this.onVideoSelect}
+                videos={this.state.videos}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
